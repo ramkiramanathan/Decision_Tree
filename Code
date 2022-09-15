@@ -1,0 +1,69 @@
+**Importing the libraries**
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as  plt
+from sklearn.metrics import confusion_matrix,accuracy_score,plot_roc_curve,roc_auc_score,f1_score
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+
+**Importing the dataset**
+
+df = pd.read_csv("/content/Social_Network_Ads.csv")
+
+df.shape
+
+df.describe()
+
+df.isnull().sum()
+
+df.drop('User ID',axis = 1,inplace = True)
+
+df['Gender'].replace(['Male','Female'],[1,2],inplace = True)
+
+df.head()
+
+**Splitting the dataset into the Training set and Test set**
+
+X = df.iloc[:,:-1].values
+Y = df.iloc[:,-1].values
+
+X[:5]
+
+X_train,X_test,Y_train,Y_test = train_test_split(X,Y,test_size = 0.2)
+
+**Feature Scaling**
+
+scaler = StandardScaler()
+scaler.fit(X_train)
+X_train_scaled = scaler.transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+**Fitting Decision Tree Classification to the Training set**
+
+model = DecisionTreeClassifier(criterion="gini")
+model.fit(X_train_scaled,Y_train)
+
+**Predicting the Test set results**
+
+Y_pred = model.predict(X_test_scaled)
+
+**Making the Confusion Matrix**
+
+confusion_matrix(Y_test,Y_pred)
+
+plot_roc_curve(model,X_test_scaled,Y_test)
+
+**Visualising the Training set results**
+
+from sklearn import tree
+plt.figure(figsize = (20,20))
+feature = df.columns
+classes = ['Purchased','Not Purchased']
+tree.plot_tree(model,feature_names = feature,class_names = classes,filled = True)
+plt.show()
